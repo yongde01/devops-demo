@@ -87,7 +87,20 @@ jobs:
             echo $DOCKER_TOKEN | docker login -u $DOCKER_USERNAME --password-stdin
             echo "Pushing image to Docker Hub..."
             docker push $DOCKER_USERNAME/devops-demo:latest
-            
+  
+  # ==========================================
+  # DEPLOY JOB - Tell Railway to redeploy
+  # ==========================================
+  deploy:
+    docker:
+      - image: cimg/node:lts
+    steps:
+      - run:
+          name: Redeploy latest image on Railway
+          command: |
+            echo "Asking Railway to redeploy the latest image..."
+            npx --yes @railway/cli redeploy --service "$RAILWAY_SERVICE_ID" --yes
+            echo "Railway is now pulling $DOCKER_USERNAME/devops-demo:latest from Docker Hub."
 # ==========================================
 # WORKFLOW - Run jobs in sequence
 # ==========================================
@@ -102,3 +115,6 @@ workflows:
           context: docker-hub
           requires:
             - test
+      - deploy:
+          requires:
+            - publish
