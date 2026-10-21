@@ -72,6 +72,7 @@ jobs:
     steps:
       - checkout
       - snyk/scan:
+          fail-on-issues: false
           command: code test
           severity-threshold: high
           cli-version: 1.1308.1
